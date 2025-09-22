@@ -5,6 +5,57 @@
   <link rel="stylesheet" type="text/css" href="/style.css">
   
   <script>
+window.addEventListener('DOMContentLoaded', () => {
+  const pageSelect = document.getElementById('page');
+  const typeSelect = document.getElementById('type');
+  const sendBtn    = document.getElementById('send');
+  const content    = document.getElementById('content');
+
+  const selectedLabel = () =>
+    pageSelect.options[pageSelect.selectedIndex].text;
+
+  const parseXML = (text) => {
+    const xml = new DOMParser().parseFromString(text, 'application/xml');
+    const msg = xml.getElementsByTagName('message')[0]?.textContent || '';
+    const id  = xml.getElementsByTagName('id')[0]?.textContent;
+    return { message: msg, id };
+  };
+  const renderLikePdf = (headingText, messageText) => {
+    content.innerHTML = `
+      <h1>${headingText}</h1>
+      <p><strong>Message:</strong> ${messageText}</p>
+    `;
+  };
+
+  const sendRequest = async () => {
+    const url = pageSelect.value;
+    const accept = typeSelect.value;
+
+    const res = await fetch(url, {
+      method: 'GET',
+      headers: { 'Accept': accept },
+    });
+
+    const contentType = res.headers.get('content-type') || '';
+    const raw = await res.text();
+
+    console.log('RAW RESPONSE:', raw);
+
+    let message = '';
+    if (contentType.includes('json')) {
+      const obj = JSON.parse(raw);
+      message = obj.message || '';
+    } else if (contentType.includes('xml')) {
+      const obj = parseXML(raw);
+      message = obj.message || '';
+    } else {
+      message = raw;
+    }
+    renderLikePdf(selectedLabel(), message);
+  };
+
+  sendBtn.addEventListener('click', sendRequest);
+});
 
   </script>
 </head>

@@ -5,6 +5,16 @@ html, body {
   padding: 0;
 }
 
+label {
+  margin-right: 1rem; 
+}
+
+pre {
+  border: 1px solid #ccc;
+  padding: 1rem;
+  white-space: pre-wrap;
+}
+
 #top {
   text-align: center;
   margin: 0 auto;
